@@ -1,9 +1,6 @@
 package com.hevlar.accounting.controller;
 
-import com.hevlar.accounting.model.Account;
-import com.hevlar.accounting.model.AccountGroup;
-import com.hevlar.accounting.model.BalanceSheetAccount;
-import com.hevlar.accounting.model.IncomeStatementAccount;
+import com.hevlar.accounting.model.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -18,6 +15,15 @@ public class ChartOfAccounts {
 
     public Account getAccount(String name){
         return mapAccount.get(name);
+    }
+
+    public Map<String, Account> getCreditCardAccounts(){
+        Map<String, Account> result = new HashMap<>();
+        mapAccount.values()
+                .stream()
+                .filter(it -> it.getClass().equals(CreditCardAccount.class))
+                .forEach(it -> result.put(it.getName(), it));
+        return result;
     }
 
     public Map<String, Account> getAccounts(AccountGroup accountGroup){
@@ -57,6 +63,10 @@ public class ChartOfAccounts {
 
     public Boolean newCurrentLiability(String name, LocalDate openDate, String currency, Double openBal){
         return newAccount(new BalanceSheetAccount(name, AccountGroup.CURRENT_LIABILITIES, openDate, currency, openBal));
+    }
+
+    public Boolean newCreditCard(String name, LocalDate openDate, String currency, Double openBal, String bank, Integer statementDay, Integer dueDay){
+        return newAccount(new CreditCardAccount(name, openDate, currency, openBal, bank, statementDay, dueDay));
     }
 
     public Boolean newLongTermLiability(String name, LocalDate openDate, String currency, Double openBal){

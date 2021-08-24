@@ -21,7 +21,8 @@ class ChartOfAccountsTest {
         chartOfAccounts = new ChartOfAccounts();
         chartOfAccounts.newCurrentAsset("Bank A", LocalDate.of(2021,1, 1), "SGD", 1000.0);
         chartOfAccounts.newCurrentAsset("Bank B", LocalDate.of(2021,1, 1), "SGD", 1000.0);
-        chartOfAccounts.newCurrentLiability("Credit Card A", LocalDate.of(2021,1, 1), "SGD", 1000.0);
+        chartOfAccounts.newCurrentLiability("Student Loan", LocalDate.of(2000, 1, 1), "SGD", 1000.0);
+        chartOfAccounts.newCreditCard("Credit Card A", LocalDate.of(2021,1, 1), "SGD", 0.0, "Bank A", 1, 12);
         chartOfAccounts.newExpense("Food");
         chartOfAccounts.newRevenue("Salary");
     }
@@ -61,5 +62,10 @@ class ChartOfAccountsTest {
     void getAccount() {
         BalanceSheetAccount bank = (BalanceSheetAccount) chartOfAccounts.getAccount("Bank A");
         assertEquals(bank.getOpenBal(), new BigDecimal(1000));
+    }
+
+    @Test
+    void creditCard_is_current_liability(){
+        assertEquals(chartOfAccounts.getAccount("Credit Card A").getAccountGroup(), AccountGroup.CURRENT_LIABILITIES);
     }
 }
