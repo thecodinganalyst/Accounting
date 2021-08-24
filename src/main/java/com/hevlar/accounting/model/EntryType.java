@@ -1,5 +1,16 @@
 package com.hevlar.accounting.model;
 
+/**
+ * CREDIT and DEBIT in accounting
+ */
 public enum EntryType {
-    CREDIT, DEBIT
+    /**
+     * Credit
+     */
+    CREDIT,
+
+    /**
+     * Debit
+     */
+    DEBIT
 }

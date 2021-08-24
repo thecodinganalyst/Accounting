@@ -22,7 +22,7 @@ class CreditCardAccountTest {
         assertTrue(creditCard.setStatementDay(2));
         assertFalse(creditCard.setStatementDay(32));
         creditCard.lock();
-        assertFalse(creditCard.setStatementDay(2));
+        assertTrue(creditCard.setStatementDay(2));
     }
 
     @Test
@@ -31,6 +31,6 @@ class CreditCardAccountTest {
         assertTrue(creditCard.setDueDay(2));
         assertFalse(creditCard.setDueDay(32));
         creditCard.lock();
-        assertFalse(creditCard.setDueDay(2));
+        assertTrue(creditCard.setDueDay(2));
     }
 }
