@@ -1,5 +1,8 @@
-package com.hevlar.accounting.model;
+package com.hevlar.accounting.controller;
 
+import com.hevlar.accounting.model.Account;
+import com.hevlar.accounting.model.AccountGroup;
+import com.hevlar.accounting.model.BalanceSheetAccount;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

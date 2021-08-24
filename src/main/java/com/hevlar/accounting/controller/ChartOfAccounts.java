@@ -1,4 +1,9 @@
-package com.hevlar.accounting.model;
+package com.hevlar.accounting.controller;
+
+import com.hevlar.accounting.model.Account;
+import com.hevlar.accounting.model.AccountGroup;
+import com.hevlar.accounting.model.BalanceSheetAccount;
+import com.hevlar.accounting.model.IncomeStatementAccount;
 
 import java.time.LocalDate;
 import java.util.HashMap;
