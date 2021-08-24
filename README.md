@@ -15,6 +15,8 @@ Account
 : Income Statement Account - Revenue, Expenses, Gains, Losses
 Accounts can be locked, to prevent any editing.
 
+## Controllers
+
 Chart of Accounts
 : Hashmap of Accounts
 
