@@ -1,0 +1,13 @@
+plugins {
+    id 'gradle.java-application-conventions'
+}
+
+dependencies {
+    implementation 'org.apache.commons:commons-text'
+    implementation project(':base')
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'com.hevlar.accounting.App'
+}

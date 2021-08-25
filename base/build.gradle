@@ -1,0 +1,7 @@
+plugins {
+    id 'gradle.java-library-conventions'
+}
+
+group 'com.hevlar.accounting'
+version '1.0-SNAPSHOT'
+sourceCompatibility = '11'
