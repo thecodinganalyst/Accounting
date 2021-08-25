@@ -41,6 +41,13 @@ public class JournalEntry {
      * @param creditStatementDate for credit cards, to identify which statement should this entry appear for the credit account
      */
     public JournalEntry(AtomicLong journalId, LocalDate txDate, String item, Recurrence recurrence, String[] tags, String currency, String amount, Account debit, Account credit, LocalDate postDate, LocalDate debitStatementDate, LocalDate creditStatementDate) {
+        if(journalId == null) throw new NullPointerException("Journal ID cannot be null");
+        if(txDate == null) throw new NullPointerException("Transaction date cannot be null");
+        if(item == null || item.isBlank() || item.isEmpty()) throw new NullPointerException("Item cannot be null or blank");
+        if(currency == null || currency.isBlank() || item.isBlank()) throw new NullPointerException("Currency cannot be null or blank");
+        if(amount == null || amount.isEmpty() || amount.isBlank()) throw new NullPointerException("Amount cannot be null");
+        if(debit == null) throw new NullPointerException("Debit account cannot be null");
+        if(credit == null) throw new NullPointerException("Credit account cannot be null");
         this.journalId = journalId;
         this.txDate = txDate;
         this.item = item;

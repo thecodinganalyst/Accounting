@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Represents the chart of accounts in accounting, which is a list of all the accounts available.
  */
-public class ChartOfAccounts {
+public class ChartOfAccounts implements IChartOfAccounts {
     private final Map<String, Account> mapAccount;
 
     /**
