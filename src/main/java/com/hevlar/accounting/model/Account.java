@@ -1,5 +1,7 @@
 package com.hevlar.accounting.model;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Abstract class to represent an Account.
  * Accounts can be edited until an irreversible lock action is performed, after which, no editing is allowed, as
@@ -10,7 +12,7 @@ public abstract class Account {
 
     private String name;
     private final AccountGroup accountGroup;
-    private Boolean lock;
+    private final AtomicBoolean lock;
 
     /**
      * Default constructor to create an Account, with lock = false
@@ -20,7 +22,7 @@ public abstract class Account {
     public Account(String name, AccountGroup accountGroup) {
         this.name = name;
         this.accountGroup = accountGroup;
-        this.lock = Boolean.FALSE;
+        this.lock = new AtomicBoolean(false);
     }
 
     /**
@@ -37,7 +39,7 @@ public abstract class Account {
      * @return true if success, false if account is locked
      */
     public Boolean setName(String name) {
-        if(this.lock) return Boolean.FALSE;
+        if(isLocked()) return Boolean.FALSE;
         this.name = name;
         return Boolean.TRUE;
     }
@@ -54,7 +56,7 @@ public abstract class Account {
      * Locks the account from editing. Irreversible change, once locked, no editing of this account is possible
      */
     public void lock(){
-        this.lock = true;
+        this.lock.set(true);
     }
 
     /**
@@ -62,6 +64,6 @@ public abstract class Account {
      * @return true if account is locked, false otherwise
      */
     public Boolean isLocked(){
-        return this.lock;
+        return this.lock.get();
     }
 }
