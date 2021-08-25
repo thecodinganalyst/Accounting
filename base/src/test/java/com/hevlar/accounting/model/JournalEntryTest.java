@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +26,7 @@ class JournalEntryTest {
 
     @BeforeEach
     void setUp() {
-        je = new JournalEntry(new AtomicLong(1), LocalDate.now(), "Lunch", Recurrence.N, null, "SGD", "10.0", expense, cash, null, null, null);
+        je = new JournalEntry(1L, LocalDate.now(), "Lunch", Recurrence.N, null, "SGD", "10.0", expense, cash, null, null, null);
     }
 
     @Test

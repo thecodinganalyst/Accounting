@@ -4,14 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Represents a journal entry, ie transaction record
  */
 public class JournalEntry {
 
-    private final AtomicLong journalId;
+    private final Long journalId;
     private LocalDate txDate;
     private String item;
     private Recurrence recurrence;
@@ -40,7 +39,7 @@ public class JournalEntry {
      * @param debitStatementDate for credit cards, to identify which statement should this entry appear for the debit account
      * @param creditStatementDate for credit cards, to identify which statement should this entry appear for the credit account
      */
-    public JournalEntry(AtomicLong journalId, LocalDate txDate, String item, Recurrence recurrence, String[] tags, String currency, String amount, Account debit, Account credit, LocalDate postDate, LocalDate debitStatementDate, LocalDate creditStatementDate) {
+    public JournalEntry(Long journalId, LocalDate txDate, String item, Recurrence recurrence, String[] tags, String currency, String amount, Account debit, Account credit, LocalDate postDate, LocalDate debitStatementDate, LocalDate creditStatementDate) {
         if(journalId == null) throw new NullPointerException("Journal ID cannot be null");
         if(txDate == null) throw new NullPointerException("Transaction date cannot be null");
         if(item == null || item.isBlank() || item.isEmpty()) throw new NullPointerException("Item cannot be null or blank");
@@ -67,7 +66,7 @@ public class JournalEntry {
      * Gets the journal id
      * @return journal id
      */
-    public AtomicLong getJournalId() {
+    public Long getJournalId() {
         return journalId;
     }
 
