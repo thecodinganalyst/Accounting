@@ -1,5 +1,6 @@
 package com.hevlar.accounting.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -22,9 +23,32 @@ public class CreditCardAccount extends BalanceSheetAccount{
      * @param statementDay day in month when the statement is generated
      * @param dueDay day in month when the statement is due for payment
      */
-    public CreditCardAccount(String name, LocalDate openDate, String currency, Double openBal, String bank, Integer statementDay, Integer dueDay) {
-        super(name, AccountGroup.CURRENT_LIABILITIES, openDate, currency, openBal);
+    public CreditCardAccount(String name, LocalDate openDate, String currency, String openBal, String bank, Integer statementDay, Integer dueDay, Boolean lock) {
+        super(name, AccountGroup.CURRENT_LIABILITIES, openDate, currency, openBal, lock);
 
+        if(bank == null || bank.isBlank() || bank.isEmpty()) throw new NullPointerException("Bank cannot be empty");
+        if(!validDay(statementDay)) throw new IllegalArgumentException("Statement day must be between 1 and 31");
+        if(!validDay(dueDay)) throw new IllegalArgumentException("Due day must be between 1 and 31");
+
+        this.bank = bank;
+        this.statementDay = statementDay;
+        this.dueDay = dueDay;
+    }
+
+    /**
+     * Default construct to create a new credit card account
+     * @param name name of the credit card
+     * @param openDate opening date
+     * @param currency currency - the ISO 4217 code of the currency, eg. SGD, USD
+     * @param openBal opening balance
+     * @param bank bank name
+     * @param statementDay day in month when the statement is generated
+     * @param dueDay day in month when the statement is due for payment
+     */
+    public CreditCardAccount(String name, LocalDate openDate, String currency, BigDecimal openBal, String bank, Integer statementDay, Integer dueDay, Boolean lock) {
+        super(name, AccountGroup.CURRENT_LIABILITIES, openDate, currency, openBal, lock);
+
+        if(bank == null || bank.isBlank() || bank.isEmpty()) throw new NullPointerException("Bank cannot be empty");
         if(!validDay(statementDay)) throw new IllegalArgumentException("Statement day must be between 1 and 31");
         if(!validDay(dueDay)) throw new IllegalArgumentException("Due day must be between 1 and 31");
 

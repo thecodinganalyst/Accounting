@@ -10,7 +10,7 @@ public class IncomeStatementAccount extends Account{
      * @param name name of the account
      * @param accountGroup account group - like Revenue, Expense, etc
      */
-    public IncomeStatementAccount(String name, AccountGroup accountGroup) {
-        super(name, accountGroup);
+    public IncomeStatementAccount(String name, AccountGroup accountGroup, Boolean lock) {
+        super(name, accountGroup, lock);
     }
 }

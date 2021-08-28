@@ -13,7 +13,7 @@ class CreditCardAccountTest {
 
     @BeforeEach
     void setUp() {
-        creditCard = new CreditCardAccount("Credit Card A", LocalDate.now(), "SGD", 0.0, "Bank A", 1, 13);
+        creditCard = new CreditCardAccount("Credit Card A", LocalDate.now(), "SGD", "0.0", "Bank A", 1, 13, false);
     }
 
     @Test

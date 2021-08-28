@@ -1,10 +1,20 @@
 plugins {
     id 'gradle.java-application-conventions'
+    id 'org.springframework.boot' version '2.5.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
+
+group 'com.hevlar.accounting'
+version '1.0-SNAPSHOT'
+sourceCompatibility = '11'
 
 dependencies {
     implementation 'org.apache.commons:commons-text'
     implementation project(':base')
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 application {

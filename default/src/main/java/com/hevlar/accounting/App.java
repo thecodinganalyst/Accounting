@@ -1,16 +1,13 @@
 package com.hevlar.accounting;
 
-import com.hevlar.accounting.controller.ChartOfAccounts;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
 public class App{
 
     public static void main(String[] args){
-        App app = new App();
+        SpringApplication.run(App.class, args);
     }
 
-    ChartOfAccounts chartOfAccounts;
-
-    public App(){
-        chartOfAccounts = new ChartOfAccounts();
-    }
 }

@@ -8,7 +8,7 @@ class AccountTest {
 
     @Test
     void setName_disallowed_for_locked_account() {
-        IncomeStatementAccount income = new IncomeStatementAccount("income", AccountGroup.REVENUE);
+        IncomeStatementAccount income = new IncomeStatementAccount("income", AccountGroup.REVENUE, false);
         income.lock();
         assertFalse(income.setName("Income"));
     }

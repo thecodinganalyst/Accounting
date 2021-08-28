@@ -19,10 +19,10 @@ public abstract class Account {
      * @param name name of the account
      * @param accountGroup account group
      */
-    public Account(String name, AccountGroup accountGroup) {
+    public Account(String name, AccountGroup accountGroup, Boolean lock) {
         this.name = name;
         this.accountGroup = accountGroup;
-        this.lock = new AtomicBoolean(false);
+        this.lock = new AtomicBoolean(lock);
     }
 
     /**
@@ -65,5 +65,9 @@ public abstract class Account {
      */
     public Boolean isLocked(){
         return this.lock.get();
+    }
+
+    public AccountType getAccountType(){
+        return this.accountGroup.accountType;
     }
 }

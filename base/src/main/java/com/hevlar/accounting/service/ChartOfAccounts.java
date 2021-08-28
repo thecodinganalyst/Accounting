@@ -1,22 +1,31 @@
-package com.hevlar.accounting.controller;
+package com.hevlar.accounting.service;
 
 import com.hevlar.accounting.model.*;
+import com.hevlar.accounting.repository.AccountData;
+import com.hevlar.accounting.repository.AccountDataRepository;
+import com.hevlar.accounting.util.ModelMapping;
+import org.springframework.data.util.Streamable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * Represents the chart of accounts in accounting, which is a list of all the accounts available.
  */
-public class ChartOfAccounts implements IChartOfAccounts {
-    private final Map<String, Account> mapAccount;
+@Service
+@Transactional
+public class ChartOfAccounts {
+
+    private final AccountDataRepository accountDataRepository;
 
     /**
      * Default constructor
+     * @param accountDataRepository repository
      */
-    public ChartOfAccounts(){
-        mapAccount = new HashMap<>();
+    public ChartOfAccounts(AccountDataRepository accountDataRepository){
+        this.accountDataRepository = accountDataRepository;
     }
 
     /**
@@ -24,21 +33,19 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param name name of account to be retrieved
      * @return Account
      */
-    public Account getAccount(String name){
-        return mapAccount.get(name);
+    public Account getAccount(String name) {
+        AccountData data = accountDataRepository.findByName(name);
+        return ModelMapping.toAccount(data);
     }
 
     /**
      * Gets a hashmap of the credit card accounts available
      * @return hashmap of credit card accounts
      */
-    public Map<String, Account> getCreditCardAccounts(){
-        Map<String, Account> result = new HashMap<>();
-        mapAccount.values()
-                .stream()
-                .filter(it -> it.getClass().equals(CreditCardAccount.class))
-                .forEach(it -> result.put(it.getName(), it));
-        return result;
+    public Streamable<Account> getCreditCardAccounts(){
+        return accountDataRepository
+                .findAllByBankNotNull()
+                .map(ModelMapping::toAccount);
     }
 
     /**
@@ -46,20 +53,19 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param accountGroup account group - eg. Current Assets, Revenue, etc
      * @return hashmap of accounts
      */
-    public Map<String, Account> getAccounts(AccountGroup accountGroup){
-        Map<String, Account> result = new HashMap<>();
-        mapAccount.values()
-                .stream()
-                .filter(it -> it.getAccountGroup().equals(accountGroup))
-                .forEach(it -> result.put(it.getName(), it));
-        return result;
+    public Streamable<Account> getAccounts(AccountGroup accountGroup){
+        return accountDataRepository
+                .findByAccountGroup(accountGroup.label)
+                .map(ModelMapping::toAccount);
     }
 
     /**
      * lock all the accounts available
      */
     public void lock(){
-        mapAccount.values().forEach(Account::lock);
+        Iterable<AccountData> allAccounts = accountDataRepository.findAll();
+        allAccounts.forEach(accountData -> accountData.setLock(true));
+        accountDataRepository.saveAll(allAccounts);
     }
 
     /**
@@ -68,16 +74,15 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @return true if successful, false if the operation failed (not found, locked)
      */
     public Boolean deleteAccount(String name){
-        if(!mapAccount.containsKey(name) || mapAccount.get(name).isLocked()) {
-            return Boolean.FALSE;
-        }
-        mapAccount.remove(name);
+        AccountData accountData = accountDataRepository.findByName(name);
+        if(accountData == null || accountData.isLocked()) return Boolean.FALSE;
+        accountDataRepository.delete(accountData);
         return Boolean.TRUE;
     }
 
     private Boolean newAccount(Account account){
-        if(mapAccount.containsKey(account.getName())) return Boolean.FALSE;
-        mapAccount.put(account.getName(), account);
+        if(accountDataRepository.findByName(account.getName()) != null) return Boolean.FALSE;
+        accountDataRepository.save(ModelMapping.toAccountData(account));
         return Boolean.TRUE;
     }
 
@@ -89,8 +94,8 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newFixedAsset(String name, LocalDate openDate, String currency, Double openBal){
-        return newAccount(new BalanceSheetAccount(name, AccountGroup.FIXED_ASSETS, openDate, currency, openBal));
+    public Boolean newFixedAsset(String name, LocalDate openDate, String currency, String openBal){
+        return newAccount(new BalanceSheetAccount(name, AccountGroup.FIXED_ASSETS, openDate, currency, openBal, false));
     }
 
     /**
@@ -101,8 +106,8 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newCurrentAsset(String name, LocalDate openDate, String currency, Double openBal){
-        return newAccount(new BalanceSheetAccount(name, AccountGroup.CURRENT_ASSETS, openDate, currency, openBal));
+    public Boolean newCurrentAsset(String name, LocalDate openDate, String currency, String openBal){
+        return newAccount(new BalanceSheetAccount(name, AccountGroup.CURRENT_ASSETS, openDate, currency, openBal, false));
     }
 
     /**
@@ -113,8 +118,8 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newCurrentLiability(String name, LocalDate openDate, String currency, Double openBal){
-        return newAccount(new BalanceSheetAccount(name, AccountGroup.CURRENT_LIABILITIES, openDate, currency, openBal));
+    public Boolean newCurrentLiability(String name, LocalDate openDate, String currency, String openBal){
+        return newAccount(new BalanceSheetAccount(name, AccountGroup.CURRENT_LIABILITIES, openDate, currency, openBal, false));
     }
 
     /**
@@ -128,8 +133,8 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param dueDay day of month when statement is due for payment
      * @return true if successful, false otherwise
      */
-    public Boolean newCreditCard(String name, LocalDate openDate, String currency, Double openBal, String bank, Integer statementDay, Integer dueDay){
-        return newAccount(new CreditCardAccount(name, openDate, currency, openBal, bank, statementDay, dueDay));
+    public Boolean newCreditCard(String name, LocalDate openDate, String currency, String openBal, String bank, Integer statementDay, Integer dueDay){
+        return newAccount(new CreditCardAccount(name, openDate, currency, openBal, bank, statementDay, dueDay, false));
     }
 
     /**
@@ -140,8 +145,8 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newLongTermLiability(String name, LocalDate openDate, String currency, Double openBal){
-        return newAccount(new BalanceSheetAccount(name, AccountGroup.LONG_TERM_LIABILITIES, openDate, currency, openBal));
+    public Boolean newLongTermLiability(String name, LocalDate openDate, String currency, String openBal){
+        return newAccount(new BalanceSheetAccount(name, AccountGroup.LONG_TERM_LIABILITIES, openDate, currency, openBal, false));
     }
 
     /**
@@ -152,8 +157,8 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newEquity(String name, LocalDate openDate, String currency, Double openBal){
-        return newAccount(new BalanceSheetAccount(name, AccountGroup.EQUITIES, openDate, currency, openBal));
+    public Boolean newEquity(String name, LocalDate openDate, String currency, String openBal){
+        return newAccount(new BalanceSheetAccount(name, AccountGroup.EQUITIES, openDate, currency, openBal, false));
     }
 
     /**
@@ -162,7 +167,7 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @return true if successful, false otherwise
      */
     public Boolean newRevenue(String name){
-        return newAccount(new IncomeStatementAccount(name, AccountGroup.REVENUE));
+        return newAccount(new IncomeStatementAccount(name, AccountGroup.REVENUE, false));
     }
 
     /**
@@ -171,7 +176,7 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @return true if successful, false otherwise
      */
     public Boolean newExpense(String name){
-        return newAccount(new IncomeStatementAccount(name, AccountGroup.EXPENSES));
+        return newAccount(new IncomeStatementAccount(name, AccountGroup.EXPENSES, false));
     }
 
     /**
@@ -180,7 +185,7 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @return true if successful, false otherwise
      */
     public Boolean newGain(String name){
-        return newAccount(new IncomeStatementAccount(name, AccountGroup.GAINS));
+        return newAccount(new IncomeStatementAccount(name, AccountGroup.GAINS, false));
     }
 
     /**
@@ -189,6 +194,6 @@ public class ChartOfAccounts implements IChartOfAccounts {
      * @return true if successful, false otherwise
      */
     public Boolean newLoss(String name){
-        return newAccount(new IncomeStatementAccount(name, AccountGroup.LOSSES));
+        return newAccount(new IncomeStatementAccount(name, AccountGroup.LOSSES, false));
     }
 }

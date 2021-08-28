@@ -1,5 +1,7 @@
 package com.hevlar.accounting.model;
 
+import java.util.Arrays;
+
 /**
  * Represents the fixed account groups - assets, liabilities, revenue, expenses, etc in accounting
  */
@@ -63,6 +65,17 @@ public enum AccountGroup {
      * Account Type - Balance Sheet or Income Statement
      */
     public final AccountType accountType;
+
+    public static AccountGroup fromLabel(String label){
+        return Arrays.stream(AccountGroup.values())
+                .filter(accountGroup -> accountGroup.label.equals(label))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public static AccountType getAccountTypeFromLabel(String label){
+        return AccountGroup.fromLabel(label).accountType;
+    }
 
     /**
      * Creates a new Account Group

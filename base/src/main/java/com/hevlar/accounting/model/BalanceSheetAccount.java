@@ -1,6 +1,7 @@
 package com.hevlar.accounting.model;
 
 import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.util.Currency;
 
@@ -21,8 +22,10 @@ public class BalanceSheetAccount extends Account{
      * @param currency ISO 4217 code of the currency to be associated with this account
      * @param openBal opening balance
      */
-    public BalanceSheetAccount(String name, AccountGroup accountGroup, LocalDate openDate, String currency, Double openBal) {
-        super(name, accountGroup);
+    public BalanceSheetAccount(String name, AccountGroup accountGroup, LocalDate openDate, String currency, String openBal, Boolean lock) {
+        super(name, accountGroup, lock);
+        if(openDate == null) throw new InvalidParameterException("Opening Date cannot be null");
+        if(currency == null || currency.isBlank() || currency.isEmpty()) throw new InvalidParameterException("Currency cannot be empty");
         this.openDate = openDate;
         this.currency = Currency.getInstance(currency);
         this.openBal = new BigDecimal(openBal);
@@ -36,8 +39,10 @@ public class BalanceSheetAccount extends Account{
      * @param currency ISO 4217 code of the currency to be associated with this account
      * @param openBal opening balance
      */
-    public BalanceSheetAccount(String name, AccountGroup accountGroup, LocalDate openDate, String currency, BigDecimal openBal) {
-        super(name, accountGroup);
+    public BalanceSheetAccount(String name, AccountGroup accountGroup, LocalDate openDate, String currency, BigDecimal openBal, Boolean lock) {
+        super(name, accountGroup, lock);
+        if(openDate == null) throw new InvalidParameterException("Opening Date cannot be null");
+        if(currency == null || currency.isBlank() || currency.isEmpty()) throw new InvalidParameterException("Currency cannot be empty");
         this.openDate = openDate;
         this.currency = Currency.getInstance(currency);
         this.openBal = openBal;
