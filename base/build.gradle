@@ -1,8 +1,10 @@
 plugins {
+
     id 'gradle.java-library-conventions'
     id 'org.springframework.boot' version '2.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'jacoco'
+    id 'info.solidsoft.pitest' version '1.5.1'
 }
 
 group 'com.hevlar.accounting'
@@ -20,6 +22,7 @@ jar {
 test {
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
+
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
 }
@@ -28,7 +31,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.7
+                minimum = 0.6
             }
         }
 
@@ -44,6 +47,15 @@ jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+pitest {
+    targetClasses = ['com.hevlar.accounting.*']  //by default "${project.group}.*"
+    targetTests = ['com.hevlar.accounting.*']
+    threads = 4
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
+    junit5PluginVersion = '0.12'
 }
 
 dependencies {
