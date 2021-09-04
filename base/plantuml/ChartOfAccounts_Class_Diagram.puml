@@ -1,0 +1,93 @@
+@startuml
+interface AccountDataRepository {
+}
+class CreditCardAccount {
++ String getBank()
++ Boolean setBank(String)
++ Integer getStatementDay()
++ Boolean setStatementDay(Integer)
++ Integer getDueDay()
++ Boolean setDueDay(Integer)
+}
+class ChartOfAccounts {
++ Account getAccount(String)
++ Streamable<Account> getCreditCardAccounts()
++ Streamable<Account> getAccounts(AccountGroup)
++ void lock()
++ Boolean deleteAccount(String)
++ Boolean newFixedAsset(String,LocalDate,String,String)
++ Boolean newCurrentAsset(String,LocalDate,String,String)
++ Boolean newCurrentLiability(String,LocalDate,String,String)
++ Boolean newCreditCard(String,LocalDate,String,String,String,Integer,Integer)
++ Boolean newLongTermLiability(String,LocalDate,String,String)
++ Boolean newEquity(String,LocalDate,String,String)
++ Boolean newRevenue(String)
++ Boolean newExpense(String)
++ Boolean newGain(String)
++ Boolean newLoss(String)
+}
+class AccountBuilder {
++ Account build()
++ void setName(String)
++ void setAccountGroup(String)
++ void setOpenDate(LocalDate)
++ void setCurrency(String)
++ void setOpenBal(BigDecimal)
++ void setBank(String)
++ void setStatementDay(Integer)
++ void setDueDay(Integer)
++ void setLock(Boolean)
+}
+class BalanceSheetAccount {
++ LocalDate getOpenDate()
++ Boolean setOpenDate(LocalDate)
++ Currency getCurrency()
++ Boolean setCurrency(String)
++ BigDecimal getOpenBal()
++ Boolean setOpenBal(double)
+}
+class AccountData {
++ Boolean isLocked()
++ String getBank()
++ Integer getStatementDay()
++ Integer getDueDay()
++ String getName()
++ String getAccountGroup()
++ LocalDate getOpenDate()
++ String getCurrency()
++ BigDecimal getOpenBal()
++ void setName(String)
++ void setAccountGroup(String)
++ void setOpenDate(LocalDate)
++ void setCurrency(String)
++ void setOpenBal(BigDecimal)
++ void setBank(String)
++ void setStatementDay(Integer)
++ void setDueDay(Integer)
++ void setLock(Boolean)
+}
+abstract class Account {
++ String getName()
++ Boolean setName(String)
++ AccountGroup getAccountGroup()
++ void lock()
++ Boolean isLocked()
++ AccountType getAccountType()
+}
+class IncomeStatementAccount {
+}
+class ModelMapping {
++ {static} Account toAccount(AccountData)
++ {static} AccountData toAccountData(Account)
+}
+
+JpaRepository <|-- AccountDataRepository
+BalanceSheetAccount <|-- CreditCardAccount
+Account <|-- BalanceSheetAccount
+Account <|-- IncomeStatementAccount
+ChartOfAccounts o-- Account : contains
+AccountDataRepository --> "stores" AccountData
+Account --> "stores as" AccountData
+AccountBuilder --> "builds" Account
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+actor Accountant as A
+
+package ChartOfAccounts {
+    usecase "Create Account" as create_account
+    usecase "Modify Account" as modify_account
+    usecase "Lock Accounts" as lock_accounts
+    usecase "Query Accounts" as query_accounts
+}
+
+A --> create_account
+A --> modify_account
+A --> lock_accounts
+A --> query_accounts
+
+@enduml
