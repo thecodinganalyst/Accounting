@@ -13,6 +13,40 @@ import static org.junit.jupiter.api.Assertions.*;
 class ModelMappingTest {
 
     @Test
+    void toAccountData_IncomeStatementAccount(){
+        IncomeStatementAccount income = new IncomeStatementAccount("Food", AccountGroup.EXPENSES, true);
+        AccountData accountData = ModelMapping.toAccountData(income);
+        assertEquals(accountData.getName(), "Food");
+        assertEquals(accountData.getAccountGroup(), AccountGroup.EXPENSES.label);
+        assertTrue(accountData.isLocked());
+    }
+
+    @Test
+    void toAccountData_BalanceSheetAccount(){
+        BalanceSheetAccount account = new BalanceSheetAccount("Bank", AccountGroup.CURRENT_ASSETS, LocalDate.of(2021, 1, 1), "SGD", "100.0", true);
+        AccountData accountData = ModelMapping.toAccountData(account);
+        assertEquals(accountData.getName(), "Bank");
+        assertEquals(accountData.getAccountGroup(), AccountGroup.CURRENT_ASSETS.label);
+        assertEquals(accountData.getOpenDate(), LocalDate.of(2021, 1, 1));
+        assertEquals(accountData.getCurrency(), "SGD");
+        assertEquals(accountData.getOpenBal(), new BigDecimal("100.0"));
+    }
+
+    @Test
+    void toAccountData_CreditCardAccount(){
+        CreditCardAccount account = new CreditCardAccount("Bank", LocalDate.of(2021, 1, 1), "SGD", "100.0", "Bank A", 1, 12, true);
+        AccountData accountData = ModelMapping.toAccountData(account);
+        assertEquals(accountData.getName(), "Bank");
+        assertEquals(accountData.getAccountGroup(), AccountGroup.CURRENT_LIABILITIES.label);
+        assertEquals(accountData.getOpenDate(), LocalDate.of(2021, 1, 1));
+        assertEquals(accountData.getCurrency(), "SGD");
+        assertEquals(accountData.getOpenBal(), new BigDecimal("100.0"));
+        assertEquals(accountData.getBank(), "Bank A");
+        assertEquals(accountData.getStatementDay(), 1);
+        assertEquals(accountData.getDueDay(), 12);
+    }
+
+    @Test
     void toAccount_IncomeStatementAccount() {
         AccountData accountData = new AccountData("Expense", AccountGroup.EXPENSES.label, false);
         Account account = ModelMapping.toAccount(accountData);

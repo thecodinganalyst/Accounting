@@ -4,7 +4,9 @@ import com.hevlar.accounting.model.*;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.security.InvalidParameterException;
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,5 +49,14 @@ class AccountBuilderTest {
         builder.setLock(false);
         Account account = builder.build();
         assertEquals(account.getClass(), CreditCardAccount.class);
+    }
+
+    @Test
+    void buildInvalidAccountType(){
+        AccountBuilder builder = new AccountBuilder();
+        builder.setName("Food");
+        builder.setAccountGroup(null);
+        builder.setLock(false);
+        assertThrows(NoSuchElementException.class, builder::build);
     }
 }

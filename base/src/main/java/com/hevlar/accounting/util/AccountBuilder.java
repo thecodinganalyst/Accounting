@@ -25,10 +25,9 @@ public class AccountBuilder {
         AccountType accountType = AccountGroup.getAccountTypeFromLabel(accountGroup);
         if(accountType == AccountType.BalanceSheet){
             return buildBalanceSheetAccount();
-        }else if(accountType == AccountType.IncomeStatement){
+        }else{
             return buildIncomeStatementAccount();
         }
-        throw new InvalidParameterException("Unable to determine account group for " + accountGroup);
     }
 
     private IncomeStatementAccount buildIncomeStatementAccount(){
