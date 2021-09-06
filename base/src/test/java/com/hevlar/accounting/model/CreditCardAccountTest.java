@@ -29,7 +29,9 @@ class CreditCardAccountTest {
     @Test
     void setStatementDay_within_boundaries() {
         assertFalse(creditCard.setStatementDay(0));
+        assertTrue(creditCard.setStatementDay(1));
         assertTrue(creditCard.setStatementDay(2));
+        assertTrue(creditCard.setStatementDay(31));
         assertFalse(creditCard.setStatementDay(32));
         creditCard.lock();
         assertTrue(creditCard.setStatementDay(2));
@@ -38,7 +40,9 @@ class CreditCardAccountTest {
     @Test
     void setDueDay_within_boundaries() {
         assertFalse(creditCard.setDueDay(0));
+        assertTrue(creditCard.setDueDay(1));
         assertTrue(creditCard.setDueDay(2));
+        assertTrue(creditCard.setDueDay(31));
         assertFalse(creditCard.setDueDay(32));
         creditCard.lock();
         assertTrue(creditCard.setDueDay(2));

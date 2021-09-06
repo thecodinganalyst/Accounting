@@ -77,13 +77,13 @@ public class ChartOfAccounts {
         AccountData accountData = accountDataRepository.findByName(name);
         if(accountData == null || accountData.isLocked()) return Boolean.FALSE;
         accountDataRepository.delete(accountData);
-        return Boolean.TRUE;
+        return true;
     }
 
     private Boolean newAccount(Account account){
-        if(accountDataRepository.findByName(account.getName()) != null) return Boolean.FALSE;
+        if(accountDataRepository.findByName(account.getName()) != null) return false;
         accountDataRepository.save(ModelMapping.toAccountData(account));
-        return Boolean.TRUE;
+        return true;
     }
 
     /**

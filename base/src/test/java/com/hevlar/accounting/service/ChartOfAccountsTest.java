@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -91,15 +92,98 @@ class ChartOfAccountsTest {
     }
 
     @Test
-    void deleteAccount_not_allowed_for_locked_account() {
-        Mockito.when(accountDataRepository.findAll()).thenReturn(
-                List.of(
-                        new AccountData("Food", AccountGroup.EXPENSES.label, false)
+    void getCreditCardAccounts_correctly(){
+        Mockito.when(accountDataRepository.findAllByBankNotNull()).thenReturn(
+                Streamable.of(
+                        new AccountData("Credit Card", AccountGroup.CURRENT_LIABILITIES.label, LocalDate.of(2021,1,1), "SGD", new BigDecimal("100"), "Bank A", 1, 12, false)
                 )
         );
-        Mockito.when(accountDataRepository.findByName("Account")).thenReturn(
-                new AccountData("Food", AccountGroup.EXPENSES.label, false));
+        List<Account> accountList = chartOfAccounts.getCreditCardAccounts().toList();
+        assertEquals(accountList.size(), 1);
+        CreditCardAccount account = (CreditCardAccount) accountList.get(0);
+        assertEquals(account.getName(), "Credit Card");
+        assertEquals(account.getAccountGroup(), AccountGroup.CURRENT_LIABILITIES);
+        assertEquals(account.getOpenDate(), LocalDate.of(2021, 1, 1));
+        assertEquals(account.getCurrency().getCurrencyCode(), "SGD");
+        assertEquals(account.getOpenBal(), new BigDecimal("100"));
+        assertEquals(account.getBank(), "Bank A");
+        assertEquals(account.getStatementDay(), 1);
+        assertEquals(account.getDueDay(), 12);
+        assertFalse(account.isLocked());
+    }
+
+    @Test
+    void deleteAccount_not_allowed_for_locked_account() {
+        Mockito.when(accountDataRepository.findByName("Food")).thenReturn(
+                new AccountData("Food", AccountGroup.EXPENSES.label, true));
         assertFalse(chartOfAccounts.deleteAccount("Food"));
+    }
+
+    @Test
+    void deleteAccount_return_false_when_account_not_found() {
+        Mockito.when(accountDataRepository.findByName("Food")).thenReturn(null);
+        assertFalse(chartOfAccounts.deleteAccount("Food"));
+    }
+
+    @Test
+    void deleteAccount_successful() {
+        Mockito.when(accountDataRepository.findByName("Food")).thenReturn(
+                new AccountData("Food", AccountGroup.EXPENSES.label, false));
+        assertTrue(chartOfAccounts.deleteAccount("Food"));
+    }
+
+    @Test
+    void newFixedAsset_successful(){
+        Mockito.when(accountDataRepository.findByName("Investment")).thenReturn(null);
+        assertTrue(chartOfAccounts.newFixedAsset("Investment", LocalDate.now(), "SGD", "100"));
+    }
+
+    @Test
+    void newCurrentAsset_successful(){
+        Mockito.when(accountDataRepository.findByName("Cash")).thenReturn(null);
+        assertTrue(chartOfAccounts.newCurrentAsset("Cash", LocalDate.now(), "SGD", "100"));
+    }
+
+    @Test
+    void newCurrentLiability_successful(){
+        Mockito.when(accountDataRepository.findByName("Loan")).thenReturn(null);
+        assertTrue(chartOfAccounts.newCurrentLiability("Loan", LocalDate.now(), "SGD", "100"));
+    }
+
+    @Test
+    void newCreditCard_successful(){
+        Mockito.when(accountDataRepository.findByName("Credit Card")).thenReturn(null);
+        assertTrue(chartOfAccounts.newCreditCard("Credit Card", LocalDate.now(), "SGD", "100", "Bank A", 1, 12));
+    }
+
+    @Test
+    void newLongTermLiability_successful(){
+        Mockito.when(accountDataRepository.findByName("Loan")).thenReturn(null);
+        assertTrue(chartOfAccounts.newLongTermLiability("Loan", LocalDate.now(), "SGD", "100"));
+    }
+
+    @Test
+    void newEquity_successful(){
+        Mockito.when(accountDataRepository.findByName("Shareholder investment")).thenReturn(null);
+        assertTrue(chartOfAccounts.newEquity("Shareholder investment", LocalDate.now(), "SGD", "100"));
+    }
+
+    @Test
+    void newGain_successful(){
+        Mockito.when(accountDataRepository.findByName("Profit from exchange rates")).thenReturn(null);
+        assertTrue(chartOfAccounts.newGain("Profit from exchange rates"));
+    }
+
+    @Test
+    void newLoss_successful(){
+        Mockito.when(accountDataRepository.findByName("Loss from exchange rates")).thenReturn(null);
+        assertTrue(chartOfAccounts.newLoss("Loss from exchange rates"));
+    }
+
+    @Test
+    void newExpense_successful(){
+        Mockito.when(accountDataRepository.findByName("Food")).thenReturn(null);
+        assertTrue(chartOfAccounts.newExpense("Food"));
     }
 
     @Test

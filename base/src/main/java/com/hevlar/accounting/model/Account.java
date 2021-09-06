@@ -39,9 +39,9 @@ public abstract class Account {
      * @return true if success, false if account is locked
      */
     public Boolean setName(String name) {
-        if(isLocked()) return Boolean.FALSE;
+        if(isLocked()) return false;
         this.name = name;
-        return Boolean.TRUE;
+        return true;
     }
 
     /**

@@ -62,9 +62,9 @@ public class BalanceSheetAccount extends Account{
      * @return true, if successful, false if the account is already locked
      */
     public Boolean setOpenDate(LocalDate openDate) {
-        if(this.isLocked()) return Boolean.FALSE;
+        if(this.isLocked()) return false;
         this.openDate = openDate;
-        return Boolean.TRUE;
+        return true;
     }
 
     /**
@@ -81,9 +81,9 @@ public class BalanceSheetAccount extends Account{
      * @return true, if successful, false if the account is already locked
      */
     public Boolean setCurrency(String currency) {
-        if(this.isLocked()) return Boolean.FALSE;
+        if(this.isLocked()) return false;
         this.currency = Currency.getInstance(currency);
-        return Boolean.TRUE;
+        return true;
     }
 
     /**
@@ -100,9 +100,9 @@ public class BalanceSheetAccount extends Account{
      * @return true if successful, false if account is already locked
      */
     public Boolean setOpenBal(double openBal) {
-        if(this.isLocked()) return Boolean.FALSE;
+        if(this.isLocked()) return false;
         this.openBal = new BigDecimal(openBal);
-        return Boolean.TRUE;
+        return true;
     }
 
 }
