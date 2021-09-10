@@ -75,15 +75,15 @@ public class ChartOfAccounts {
      */
     public Boolean deleteAccount(String name){
         AccountData accountData = accountDataRepository.findByName(name);
-        if(accountData == null || accountData.isLocked()) return Boolean.FALSE;
+        if(accountData == null || accountData.isLocked()) return false;
         accountDataRepository.delete(accountData);
         return true;
     }
 
-    private Boolean newAccount(Account account){
-        if(accountDataRepository.findByName(account.getName()) != null) return false;
-        accountDataRepository.save(ModelMapping.toAccountData(account));
-        return true;
+    private Account newAccount(Account account){
+        if(accountDataRepository.findByName(account.getName()) != null) return null;
+        AccountData accountData = accountDataRepository.save(ModelMapping.toAccountData(account));
+        return ModelMapping.toAccount(accountData);
     }
 
     /**
@@ -94,7 +94,7 @@ public class ChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newFixedAsset(String name, LocalDate openDate, String currency, String openBal){
+    public Account newFixedAsset(String name, LocalDate openDate, String currency, String openBal){
         return newAccount(new BalanceSheetAccount(name, AccountGroup.FIXED_ASSETS, openDate, currency, openBal, false));
     }
 
@@ -106,7 +106,7 @@ public class ChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newCurrentAsset(String name, LocalDate openDate, String currency, String openBal){
+    public Account newCurrentAsset(String name, LocalDate openDate, String currency, String openBal){
         return newAccount(new BalanceSheetAccount(name, AccountGroup.CURRENT_ASSETS, openDate, currency, openBal, false));
     }
 
@@ -118,7 +118,7 @@ public class ChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newCurrentLiability(String name, LocalDate openDate, String currency, String openBal){
+    public Account newCurrentLiability(String name, LocalDate openDate, String currency, String openBal){
         return newAccount(new BalanceSheetAccount(name, AccountGroup.CURRENT_LIABILITIES, openDate, currency, openBal, false));
     }
 
@@ -133,7 +133,7 @@ public class ChartOfAccounts {
      * @param dueDay day of month when statement is due for payment
      * @return true if successful, false otherwise
      */
-    public Boolean newCreditCard(String name, LocalDate openDate, String currency, String openBal, String bank, Integer statementDay, Integer dueDay){
+    public Account newCreditCard(String name, LocalDate openDate, String currency, String openBal, String bank, Integer statementDay, Integer dueDay){
         return newAccount(new CreditCardAccount(name, openDate, currency, openBal, bank, statementDay, dueDay, false));
     }
 
@@ -145,7 +145,7 @@ public class ChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newLongTermLiability(String name, LocalDate openDate, String currency, String openBal){
+    public Account newLongTermLiability(String name, LocalDate openDate, String currency, String openBal){
         return newAccount(new BalanceSheetAccount(name, AccountGroup.LONG_TERM_LIABILITIES, openDate, currency, openBal, false));
     }
 
@@ -157,7 +157,7 @@ public class ChartOfAccounts {
      * @param openBal opening balance
      * @return true if successful, false otherwise
      */
-    public Boolean newEquity(String name, LocalDate openDate, String currency, String openBal){
+    public Account newEquity(String name, LocalDate openDate, String currency, String openBal){
         return newAccount(new BalanceSheetAccount(name, AccountGroup.EQUITIES, openDate, currency, openBal, false));
     }
 
@@ -166,7 +166,7 @@ public class ChartOfAccounts {
      * @param name name of account
      * @return true if successful, false otherwise
      */
-    public Boolean newRevenue(String name){
+    public Account newRevenue(String name){
         return newAccount(new IncomeStatementAccount(name, AccountGroup.REVENUE, false));
     }
 
@@ -175,7 +175,7 @@ public class ChartOfAccounts {
      * @param name name of account
      * @return true if successful, false otherwise
      */
-    public Boolean newExpense(String name){
+    public Account newExpense(String name){
         return newAccount(new IncomeStatementAccount(name, AccountGroup.EXPENSES, false));
     }
 
@@ -184,7 +184,7 @@ public class ChartOfAccounts {
      * @param name name of account
      * @return true if successful, false otherwise
      */
-    public Boolean newGain(String name){
+    public Account newGain(String name){
         return newAccount(new IncomeStatementAccount(name, AccountGroup.GAINS, false));
     }
 
@@ -193,7 +193,7 @@ public class ChartOfAccounts {
      * @param name name of account
      * @return true if successful, false otherwise
      */
-    public Boolean newLoss(String name){
+    public Account newLoss(String name){
         return newAccount(new IncomeStatementAccount(name, AccountGroup.LOSSES, false));
     }
 }

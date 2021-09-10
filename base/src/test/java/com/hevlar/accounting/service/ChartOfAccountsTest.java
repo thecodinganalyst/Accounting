@@ -1,15 +1,16 @@
 package com.hevlar.accounting.service;
 
-import com.hevlar.accounting.model.*;
+import com.hevlar.accounting.model.Account;
+import com.hevlar.accounting.model.AccountGroup;
+import com.hevlar.accounting.model.BalanceSheetAccount;
+import com.hevlar.accounting.model.CreditCardAccount;
 import com.hevlar.accounting.repository.AccountData;
 import com.hevlar.accounting.repository.AccountDataRepository;
 import com.hevlar.accounting.util.ModelMapping;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.util.Streamable;
@@ -21,15 +22,16 @@ import java.util.Currency;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 class ChartOfAccountsTest {
 
-    ChartOfAccounts chartOfAccounts;
-    AutoCloseable closeable;
+    private ChartOfAccounts chartOfAccounts;
+    private AutoCloseable closeable;
 
     @MockBean
-    AccountDataRepository accountDataRepository;
+    private AccountDataRepository accountDataRepository;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +50,8 @@ class ChartOfAccountsTest {
         );
         BalanceSheetAccount account = (BalanceSheetAccount) ModelMapping.toAccount(accountData);
         assertEquals(account.getName(), accountData.getName());
-        assertEquals(account.getAccountGroup(), AccountGroup.CURRENT_ASSETS);
+        assertEquals(account.getAccountGroup(),
+                AccountGroup.CURRENT_ASSETS);
         assertEquals(account.getOpenDate(), accountData.getOpenDate());
         assertEquals(account.getCurrency(), Currency.getInstance("SGD"));
         assertEquals(account.getOpenBal(), accountData.getOpenBal());
@@ -58,7 +61,7 @@ class ChartOfAccountsTest {
     void ensure_no_duplicate_account_name(){
         Mockito.when(accountDataRepository.findByName("Food")).thenReturn(new AccountData("Food", AccountGroup.EXPENSES.label, false));
 
-        assertFalse(chartOfAccounts.newRevenue("Food"));
+        assertNull(chartOfAccounts.newRevenue("Food"));
     }
 
     @Test
@@ -135,55 +138,85 @@ class ChartOfAccountsTest {
     @Test
     void newFixedAsset_successful(){
         Mockito.when(accountDataRepository.findByName("Investment")).thenReturn(null);
-        assertTrue(chartOfAccounts.newFixedAsset("Investment", LocalDate.now(), "SGD", "100"));
+        AccountData accountData = new AccountData("Investment", AccountGroup.FIXED_ASSETS.label, LocalDate.of(2021,1, 1), "SGD", new BigDecimal("100"), false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        Account account = chartOfAccounts.newFixedAsset("Investment", LocalDate.of(2021,1, 1), "SGD", "100");
+        assertNotNull(account);
     }
 
     @Test
     void newCurrentAsset_successful(){
         Mockito.when(accountDataRepository.findByName("Cash")).thenReturn(null);
-        assertTrue(chartOfAccounts.newCurrentAsset("Cash", LocalDate.now(), "SGD", "100"));
+        AccountData accountData = new AccountData("Cash", AccountGroup.CURRENT_ASSETS.label, LocalDate.of(2021, 1,1), "SGD", new BigDecimal("100"), false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        Account account = chartOfAccounts.newCurrentAsset("Cash", LocalDate.of(2021, 1, 1), "SGD", "100");
+        assertNotNull(account);
     }
 
     @Test
     void newCurrentLiability_successful(){
         Mockito.when(accountDataRepository.findByName("Loan")).thenReturn(null);
-        assertTrue(chartOfAccounts.newCurrentLiability("Loan", LocalDate.now(), "SGD", "100"));
+        AccountData accountData = new AccountData("Loan", AccountGroup.CURRENT_LIABILITIES.label, LocalDate.of(2021,1, 1), "SGD", new BigDecimal("100"), false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        Account account = chartOfAccounts.newCurrentLiability("Loan", LocalDate.of(2021, 1, 1), "SGD", "100");
+        assertNotNull(account);
     }
 
     @Test
     void newCreditCard_successful(){
         Mockito.when(accountDataRepository.findByName("Credit Card")).thenReturn(null);
-        assertTrue(chartOfAccounts.newCreditCard("Credit Card", LocalDate.now(), "SGD", "100", "Bank A", 1, 12));
+        AccountData accountData = new AccountData("Credit Card", AccountGroup.CURRENT_LIABILITIES.label, LocalDate.of(2021, 1,1), "SGD", new BigDecimal("100"), "Bank A", 1, 12, false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        Account account = chartOfAccounts.newCreditCard("Credit Card", LocalDate.now(), "SGD", "100", "Bank A", 1, 12);
+        assertNotNull(account);
     }
 
     @Test
     void newLongTermLiability_successful(){
         Mockito.when(accountDataRepository.findByName("Loan")).thenReturn(null);
-        assertTrue(chartOfAccounts.newLongTermLiability("Loan", LocalDate.now(), "SGD", "100"));
+        AccountData accountData = new AccountData("Loan", AccountGroup.LONG_TERM_LIABILITIES.label, LocalDate.of(2021, 1, 1), "SGD", new BigDecimal("100"), false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        assertNotNull(chartOfAccounts.newLongTermLiability("Loan", LocalDate.of(2021, 1, 1), "SGD", "100"));
     }
 
     @Test
     void newEquity_successful(){
         Mockito.when(accountDataRepository.findByName("Shareholder investment")).thenReturn(null);
-        assertTrue(chartOfAccounts.newEquity("Shareholder investment", LocalDate.now(), "SGD", "100"));
+        AccountData accountData = new AccountData("Shareholder investment", AccountGroup.EQUITIES.label, LocalDate.of(2021, 1, 1), "SGD", new BigDecimal("100"), false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        assertNotNull(chartOfAccounts.newEquity("Shareholder investment", LocalDate.of(2021, 1,1), "SGD", "100"));
     }
 
     @Test
     void newGain_successful(){
         Mockito.when(accountDataRepository.findByName("Profit from exchange rates")).thenReturn(null);
-        assertTrue(chartOfAccounts.newGain("Profit from exchange rates"));
+        AccountData accountData = new AccountData("Profit from exchange rates", AccountGroup.GAINS.label,false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        assertNotNull(chartOfAccounts.newGain("Profit from exchange rates"));
     }
 
     @Test
     void newLoss_successful(){
         Mockito.when(accountDataRepository.findByName("Loss from exchange rates")).thenReturn(null);
-        assertTrue(chartOfAccounts.newLoss("Loss from exchange rates"));
+        AccountData accountData = new AccountData("Loss from exchange rates", AccountGroup.LOSSES.label, false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        assertNotNull(chartOfAccounts.newLoss("Loss from exchange rates"));
     }
 
     @Test
     void newExpense_successful(){
         Mockito.when(accountDataRepository.findByName("Food")).thenReturn(null);
-        assertTrue(chartOfAccounts.newExpense("Food"));
+        AccountData accountData = new AccountData("Food", AccountGroup.EXPENSES.label, false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        assertNotNull(chartOfAccounts.newExpense("Food"));
+    }
+
+    @Test
+    void newRevenue_successful(){
+        Mockito.when(accountDataRepository.findByName("Salary")).thenReturn(null);
+        AccountData accountData = new AccountData("Salary", AccountGroup.REVENUE.label, false);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        assertNotNull(chartOfAccounts.newRevenue("Salary"));
     }
 
     @Test

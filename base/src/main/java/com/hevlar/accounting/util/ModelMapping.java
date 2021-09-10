@@ -6,6 +6,7 @@ import com.hevlar.accounting.repository.AccountData;
 public class ModelMapping {
 
     public static Account toAccount(AccountData accountData){
+        if(accountData == null) return null;
         AccountBuilder accountBuilder = new AccountBuilder();
         accountBuilder.setName(accountData.getName());
         accountBuilder.setAccountGroup(accountData.getAccountGroup());
@@ -30,6 +31,7 @@ public class ModelMapping {
     }
 
     private static AccountData toAccountData(CreditCardAccount creditCardAccount){
+        if(creditCardAccount == null) return null;
         return new AccountData(
             creditCardAccount.getName(),
             creditCardAccount.getAccountGroup().label,
@@ -44,6 +46,7 @@ public class ModelMapping {
     }
 
     private static AccountData toAccountData(BalanceSheetAccount balanceSheetAccount){
+        if(balanceSheetAccount == null) return null;
         return new AccountData(
             balanceSheetAccount.getName(),
             balanceSheetAccount.getAccountGroup().label,
@@ -55,6 +58,7 @@ public class ModelMapping {
     }
 
     private static AccountData toAccountData(IncomeStatementAccount incomeStatementAccount){
+        if(incomeStatementAccount == null) return null;
         return new AccountData(
             incomeStatementAccount.getName(),
             incomeStatementAccount.getAccountGroup().label,
