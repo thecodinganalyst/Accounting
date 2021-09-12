@@ -39,6 +39,18 @@ public class ChartOfAccounts {
     }
 
     /**
+     * Saves the account to repository if the account is present and not locked
+     * @param account account to save
+     * @return account if save is successful, null otherwise
+     */
+    public Account updateAccount(Account account){
+        Account savedAccount = getAccount(account.getName());
+        if(savedAccount == null || savedAccount.isLocked()) return null;
+        AccountData accountData = accountDataRepository.save(ModelMapping.toAccountData(account));
+        return ModelMapping.toAccount(accountData);
+    }
+
+    /**
      * Gets a hashmap of the credit card accounts available
      * @return hashmap of credit card accounts
      */

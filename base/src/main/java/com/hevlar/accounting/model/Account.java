@@ -54,6 +54,7 @@ public abstract class Account {
 
     /**
      * Locks the account from editing. Irreversible change, once locked, no editing of this account is possible
+     * Note that this method does not persist, so a call to update is required.
      */
     public void lock(){
         this.lock.set(true);

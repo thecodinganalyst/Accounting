@@ -1,16 +1,15 @@
 package com.hevlar.accounting.service;
 
-import com.hevlar.accounting.model.Account;
-import com.hevlar.accounting.model.AccountGroup;
-import com.hevlar.accounting.model.BalanceSheetAccount;
-import com.hevlar.accounting.model.CreditCardAccount;
+import com.hevlar.accounting.model.*;
 import com.hevlar.accounting.repository.AccountData;
 import com.hevlar.accounting.repository.AccountDataRepository;
 import com.hevlar.accounting.util.ModelMapping;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.util.Streamable;
@@ -78,6 +77,37 @@ class ChartOfAccountsTest {
         assertEquals(currentAssets.toList().size(), 2);
         assertFalse(currentAssets.filter(account -> account.getName().equals("Bank A")).isEmpty());
         assertFalse(currentAssets.filter(account -> account.getName().equals("Bank B")).isEmpty());
+    }
+
+    @Test
+    void updateAccount_successful(){
+        AccountData accountData = new AccountData("Food", AccountGroup.EXPENSES.label, false);
+        Mockito.when(accountDataRepository.findByName("Food")).thenReturn(accountData);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        IncomeStatementAccount food = new IncomeStatementAccount("Food", AccountGroup.EXPENSES, false);
+        IncomeStatementAccount account = (IncomeStatementAccount) chartOfAccounts.updateAccount(food);
+        assertNotNull(account);
+        assertFalse(account.isLocked());
+        assertEquals(account.getName(), "Food");
+        assertEquals(account.getAccountGroup(), AccountGroup.EXPENSES);
+    }
+
+    @Test
+    void updateAccount_not_allowed_for_locked_account(){
+        AccountData accountData = new AccountData("Food", AccountGroup.EXPENSES.label, true);
+        Mockito.when(accountDataRepository.findByName("Food")).thenReturn(accountData);
+        Mockito.when(accountDataRepository.save(any(AccountData.class))).thenReturn(accountData);
+        IncomeStatementAccount food = new IncomeStatementAccount("Food", AccountGroup.EXPENSES, false);
+        IncomeStatementAccount account = (IncomeStatementAccount) chartOfAccounts.updateAccount(food);
+        assertNull(account);
+    }
+
+    @Test
+    void updateAccount_not_allowed_non_existent_accounts(){
+        Mockito.when(accountDataRepository.findByName("Food")).thenReturn(null);
+        IncomeStatementAccount food = new IncomeStatementAccount("Food", AccountGroup.EXPENSES, false);
+        IncomeStatementAccount account = (IncomeStatementAccount) chartOfAccounts.updateAccount(food);
+        assertNull(account);
     }
 
     @Test

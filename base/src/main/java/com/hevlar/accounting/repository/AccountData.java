@@ -48,6 +48,9 @@ public class AccountData {
         this.lock = lock;
     }
 
+    public AccountData(){
+    }
+
     public Boolean isLocked() {
         return lock;
     }
